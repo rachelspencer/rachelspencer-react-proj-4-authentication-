@@ -1,7 +1,10 @@
-import {useState} from 'react'
+import {useState, useContext} from 'react'
 import axios from 'axios'
+import AuthContext from '../context/authContext'
  
 const Auth = () => {
+    const authCtx = useContext(AuthContext);
+
    const [username, setUsername] = useState('')
    const [password, setPassword] = useState('')
    const [register, setRegister] = useState(true)
@@ -31,7 +34,7 @@ const Auth = () => {
             if (register) {
                 response = await axios.post('https://socialmtn.devmountain.com/register', body);
             } else {
-                response = axios.post('https://socialmtn.devmountain.com/login', body);
+                response = await axios.post('https://socialmtn.devmountain.com/login', body);
             } 
         } catch (error) {
             console.log(error);
@@ -39,6 +42,7 @@ const Auth = () => {
             setPassword('')
         }
        console.log('response', response);
+       authCtx.login(response.data.token, response.data.exp, response.data.userId);
    }
 
         // const body = {
