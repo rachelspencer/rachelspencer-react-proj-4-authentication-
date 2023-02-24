@@ -1,3 +1,6 @@
+const {DataTypes} = require('sequelize');
+const {sequelize} = require('../util/database')
+
 module.exports = {
     getAllPosts: (req, res) => {
         console.log('get all posts')
@@ -17,5 +20,5 @@ module.exports = {
 
     deletePost: (req, res) => {
         console.log('delete post')
-    }
-}
+    },
+};
