@@ -1,12 +1,69 @@
-module.exports = {
-    login: (req, res) => {
-        console.log('log in server auth');
-    },
-    register: (req, res) => {
-        console.log('logout server auth');
-    },
-};
+require('dotenv').config();
+const { SECRET } = process.env;
+const { User } = require('../models/user');
+
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+
+const createToken = (username, id) => {
+    const payload = {username, id}
+    const expiresIn = {expiresIn: '2 days'};
     
+    return jwt.sign(payload, SECRET, expiresIn)
+};
+module.exports = {
+    register: async (req, res) => {
+        try {
+            const { username, password } = req.body
+            const foundUser = await User.findOne({ where: {username}})
 
+            if (foundUser) {
+                res.status(400).send('user already exists, login instead.')
+            } else {
+                const salt = bcrypt.genSaltSync(10)
+                const hash = bcrypt.hashSync(password, salt)    
 
+                const newUser = await User.create({username, hashedPass: hash})
+                const token = createToken(newUser.dataValues.username, newUser.dataValues.id)
+                console.log(newUser)
+                console.log('TOKEN', token)
+                const exp = Date.now() + 1000 * 60 * 60 * 48
+                res.status(200).send({
+                    username: newUser.dataValues.username,
+                    userId: newUser.dataValues.id,
+                    token,
+                    exp})
+            }
+        } catch (err) {
+            console.log('register error', err)
+            res.status(400)
+        };
+    },
+    login: async (req, res) => {
+        try {
+            const { username, password } = req.body
+            const foundUser = await User.findOne({ where: {username}})
 
+            if (foundUser) {
+                const isAuthenticated = bcrypt.compareSync(password, foundUser.hashedPass)
+
+                if (isAuthenticated){
+                    const token = createToken(foundUser.dataValues.username, foundUser.dataValues.id)
+                    const exp = Date.now() + 1000 * 60 * 60 * 48
+                    res.status(200).send({
+                        username: foundUser.dataValues.username,
+                        userId: foundUser.dataValues.id,
+                        token,
+                        exp})
+                } else {
+                    res.status(400).send('cannot log in')
+                }
+            } else {
+                res.status(400).send('cannot log in')
+            }
+        } catch (error) {
+            console.log('ERROR IN register', error)
+            res.sendStatus(400)
+        }
+    }
+};

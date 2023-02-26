@@ -32,16 +32,16 @@ const Auth = () => {
   
         try {
             if (register) {
-                response = await axios.post('https://socialmtn.devmountain.com/register', body);
+                response = await axios.post('/register', body);
             } else {
-                response = await axios.post('https://socialmtn.devmountain.com/login', body);
+                response = await axios.post('/login', body);
             } 
         } catch (error) {
             console.log(error);
             setUsername('')
             setPassword('')
         }
-       console.log('response', response);
+       console.log('response auth FE', response);
        authCtx.login(response.data.token, response.data.exp, response.data.userId);
    }
 

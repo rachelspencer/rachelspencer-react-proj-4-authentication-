@@ -26,9 +26,9 @@ module.exports = {
         // if fails, err status code logged
         try {
             token = jwt.verify(headerToken, SECRET)
-        } catch (err) {
-            err.statusCode = 500
-            throw err
+        } catch (error) {
+            error.statusCode = 500
+            throw error
         }
 
         //if user cannot be verified then a 'Not authenticated' err is rendered, 401 status code logged
