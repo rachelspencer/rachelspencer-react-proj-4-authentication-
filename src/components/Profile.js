@@ -69,7 +69,7 @@ const Profile = () => {
                 <h4>{post.user.username}</h4>
                 <p>{post.content}</p>
                 {
-                    userId === post.userId &&
+                    +userId === post.userId &&
                     <div>
                         <button className='form-btn' onClick={() => updatePost(post.id, post.privateStatus)}>
                             {post.privateStatus ? 'make public' : 'make private'}
